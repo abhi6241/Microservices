@@ -44,19 +44,23 @@ app.use("/api/search", searchRoutes);
 app.use(errorHandler);
 
 async function startServer() {
-  try {
-    await connectToRabbitMQ();
+  while (true) {
+    try {
+      await connectToRabbitMQ();
 
-    // Consume the events / subscribe to the events
-    await consumeEvent("post.created", handlePostCreated);
-    await consumeEvent("post.deleted", handlePostDeleted);
+      // Consume the events / subscribe to the events
+      await consumeEvent("post.created", handlePostCreated);
+      await consumeEvent("post.deleted", handlePostDeleted);
 
-    app.listen(PORT, () => {
-      logger.info(`Search service running on port ${PORT}`);
-    });
-  } catch (e) {
-    logger.error(e, "Failed to start search service");
-    process.exit(1);
+      app.listen(PORT, () => {
+        logger.info(`Search service running on port ${PORT}`);
+      });
+
+      break; // Exit the loop once connected successfully
+    } catch (e) {
+      logger.error("Start server error", e);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
   }
 }
 
