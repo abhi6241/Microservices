@@ -39,6 +39,15 @@ app.use((req, res, next) => {
 
 // Homework - pass Redis client as part of your req and then implement redis caching
 
+// Health check
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "search-service",
+    uptime: process.uptime(),
+  });
+});
+
 app.use("/api/search", searchRoutes);
 
 app.use(errorHandler);

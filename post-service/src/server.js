@@ -33,6 +33,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", service: "post-service", uptime: process.uptime() });
+});
+
 // Routes -> pass redisclient to routes
 app.use(
   "/api/posts",

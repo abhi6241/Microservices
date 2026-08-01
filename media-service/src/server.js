@@ -30,6 +30,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "media-service",
+    uptime: process.uptime(),
+  });
+});
+
 app.use("/api/media", mediaRoutes);
 
 app.use(errorHandler);
