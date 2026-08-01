@@ -7,7 +7,9 @@ async function invalidatePostCache(req, input) {
   const cachedKey = `post:${input}`;
   await req.redisClient.del(cachedKey);
 
-  const keys = await req.redisClient.keys("Posts:*");
+  // Cache keys for the paginated feed are written as `posts:<page>:<limit>`,
+  // so the invalidation pattern must match that exact (lowercase) prefix.
+  const keys = await req.redisClient.keys("posts:*");
 
   if (keys.length > 0) {
     await req.redisClient.del(keys);
@@ -31,6 +33,9 @@ const createPost = async (req, res) => {
     const { content, mediaIds } = req.body;
     const newlyCreatedPost = new Post({
       user: req.user.userId,
+      // Denormalize the author's username at write time so the feed can render
+      // author names without a cross-service join.
+      authorUsername: req.user.username || "unknown",
       content,
       mediaIds: mediaIds || [],
     });
@@ -40,6 +45,7 @@ const createPost = async (req, res) => {
     await publishEvent("post.created", {
       postId: newlyCreatedPost._id.toString(),
       userId: newlyCreatedPost.user.toString(),
+      authorUsername: newlyCreatedPost.authorUsername,
       content: newlyCreatedPost.content,
       createdAt: newlyCreatedPost.createdAt,
     });
@@ -49,6 +55,7 @@ const createPost = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Post created successfully",
+      post: newlyCreatedPost,
     });
   } catch (e) {
     logger.error("Error creating posts", e);
@@ -81,7 +88,7 @@ const getAllPost = async (req, res) => {
 
     const result = {
       posts,
-      currentpage: page,
+      currentPage: page,
       totalPages: Math.ceil(totalNoPosts / limit),
       totalNoPosts: totalNoPosts,
     };
@@ -118,7 +125,7 @@ const getPost = async (req, res) => {
     }
 
     await req.redisClient.setex(
-      cachedPost,
+      cacheKey,
       300,
       JSON.stringify(singlePostDetailsById),
     );
