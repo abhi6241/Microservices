@@ -44,6 +44,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", service: "api-gateway", uptime: process.uptime() });
+});
+
 // Proxy options for Identity service
 const proxyOptions = {
   proxyReqPathResolver: (req) => {
@@ -86,6 +91,7 @@ app.use(
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       proxyReqOpts.headers["Content-Type"] = "application/json";
       proxyReqOpts.headers["x-user-id"] = srcReq.user.userId;
+      proxyReqOpts.headers["x-user-username"] = srcReq.user.username || "";
       return proxyReqOpts;
     },
     userResDecorator: (proxyRes, proxyResData) => {
