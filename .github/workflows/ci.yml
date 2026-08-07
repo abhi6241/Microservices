@@ -12,19 +12,78 @@ jobs:
 
     defaults:
       run:
-        working-directory: frontend/src
+        working-directory: frontend/src # Change to frontend after fixing your structure
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
+      - run: npm run build
 
-      - name: Build frontend
-        run: npm run build
+  api-gateway:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: api-gateway
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+  post-service:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: post-service
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+  media-service:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: media-service
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+  search-service:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: search-service
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
