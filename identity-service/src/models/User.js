@@ -28,15 +28,10 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   if (this.isModified("password")) {
-    try {
-      this.password = await argon2.hash(this.password);
-    } catch (e) {
-      return next(e);
-    }
+    this.password = await argon2.hash(this.password);
   }
-  next();
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {

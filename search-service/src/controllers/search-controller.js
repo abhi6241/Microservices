@@ -7,8 +7,15 @@ const searchPostController = async (req, res) => {
   try {
     const { query } = req.query;
 
+    if (!query || !String(query).trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Query parameter is required",
+      });
+    }
+
     const results = await Search.find(
-      { $text: { $search: query } },
+      { $text: { $search: String(query).trim() } },
       { score: { $meta: "textScore" } },
     )
       .sort({ score: { $meta: "textScore" } })
