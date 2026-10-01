@@ -1,9 +1,9 @@
 {
-  "name": "quill-frontend",
+  "name": "pulseboard-frontend",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Quill — a calm, editorial microblog UI for the microservices backend",
+  "description": "Pulseboard - a Google-inspired Material 3 microblog UI for the microservices backend",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
